@@ -432,5 +432,152 @@
   </footer>
 
   <script src="main.js"></script>
+
+  <!-- ===== CHATBOT ===== -->
+  <div id="chat-widget">
+    <button id="chat-bubble" aria-label="Chat with us">
+      <span id="chat-bubble-icon">💬</span>
+      <span id="chat-bubble-label">Chat Now</span>
+    </button>
+
+    <div id="chat-window" role="dialog" aria-label="Skyline chat" hidden>
+      <div id="chat-header">
+        <div class="chat-header-info">
+          <img src="logo/logo.png" alt="Skyline" class="chat-logo" />
+          <div>
+            <div class="chat-name">Skyline Support</div>
+            <div class="chat-status">&#x25CF; Online</div>
+          </div>
+        </div>
+        <button id="chat-close" aria-label="Close chat">&times;</button>
+      </div>
+
+      <div id="chat-messages"></div>
+
+      <div id="chat-footer">
+        <div id="chat-options"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const FAQ = [
+      {
+        label: "How much does it cost?",
+        answer: "Pricing depends on how much space your items take up in our truck. A single item (couch, appliance, mattress) typically starts around $75–$150. A half-truck load runs $200–$350, and a full truck load is $400–$600+. We always give you an upfront quote before we start — no surprises!"
+      },
+      {
+        label: "Do you offer same-day service?",
+        answer: "Yes! We offer same-day and next-day service depending on availability. Give us a call at (971) 283-0837 and we'll do our best to get out to you quickly — often the same day you call."
+      },
+      {
+        label: "What items do you haul away?",
+        answer: "We haul away almost everything: furniture, appliances (fridges, washers, dryers), mattresses, yard waste, construction debris, electronics, exercise equipment, hot tubs, and general household junk. We try to donate or recycle as much as possible. The few things we can't take include hazardous materials like paint, chemicals, and propane tanks."
+      },
+      {
+        label: "Do you do estate cleanouts?",
+        answer: "Absolutely. Estate cleanouts are one of our most common services. Whether you're clearing a home after a loved one has passed, prepping a rental, or dealing with a hoarding situation, we handle the entire process — sorting, hauling, and disposal. We work efficiently and respectfully."
+      },
+      {
+        label: "How do I prepare for my appointment?",
+        answer: "You don't need to do much — that's the point! Just make sure the items are accessible so our team can reach them. You don't need to move anything yourself. We load it all."
+      },
+      {
+        label: "What areas do you serve?",
+        answer: "We serve Salem and all surrounding communities: Keizer, West Salem, Silverton, Turner, Dallas, Stayton, Aumsville, and most of Marion and Polk County. Not sure if we reach you? Just call us at (971) 283-0837!"
+      },
+      {
+        label: "Are you licensed & insured?",
+        answer: "Yes! Skyline Transport Services LLC is fully licensed and insured in the state of Oregon. You can hire us with confidence knowing your property and our team are protected."
+      }
+    ];
+
+    const GREETING = "Hi there! 👋 I'm the Skyline assistant. What can I help you with today?";
+    const FOLLOWUP = "Anything else I can help with?";
+
+    const messagesEl = document.getElementById('chat-messages');
+    const optionsEl = document.getElementById('chat-options');
+    const chatWindow = document.getElementById('chat-window');
+    const chatBubble = document.getElementById('chat-bubble');
+    const chatClose = document.getElementById('chat-close');
+
+    let opened = false;
+
+    function addMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg ' + type;
+      msg.innerHTML = text;
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function showOptions(items) {
+      optionsEl.innerHTML = '';
+      items.forEach(function (item) {
+        const btn = document.createElement('button');
+        btn.className = 'chat-opt-btn';
+        btn.textContent = item.label;
+        btn.addEventListener('click', function () {
+          addMessage(item.label, 'user');
+          optionsEl.innerHTML = '';
+          setTimeout(function () {
+            addMessage(item.answer, 'bot');
+            setTimeout(function () {
+              addMessage(FOLLOWUP, 'bot');
+              showContactOrMore();
+            }, 400);
+          }, 300);
+        });
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function showContactOrMore() {
+      optionsEl.innerHTML = '';
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'chat-opt-btn';
+      moreBtn.textContent = 'Ask another question';
+      moreBtn.addEventListener('click', function () {
+        optionsEl.innerHTML = '';
+        showOptions(FAQ);
+      });
+
+      const callBtn = document.createElement('a');
+      callBtn.className = 'chat-opt-btn chat-opt-cta';
+      callBtn.href = 'tel:9712830837';
+      callBtn.textContent = '📞 Call (971) 283-0837';
+
+      const emailBtn = document.createElement('a');
+      emailBtn.className = 'chat-opt-btn chat-opt-cta';
+      emailBtn.href = 'mailto:Service@skylinetransportservicesllc.com';
+      emailBtn.textContent = '✉️ Email Us';
+
+      optionsEl.appendChild(moreBtn);
+      optionsEl.appendChild(callBtn);
+      optionsEl.appendChild(emailBtn);
+    }
+
+    function openChat() {
+      chatWindow.hidden = false;
+      chatBubble.setAttribute('aria-expanded', 'true');
+      if (!opened) {
+        opened = true;
+        addMessage(GREETING, 'bot');
+        setTimeout(function () { showOptions(FAQ); }, 400);
+      }
+    }
+
+    function closeChat() {
+      chatWindow.hidden = true;
+      chatBubble.setAttribute('aria-expanded', 'false');
+    }
+
+    chatBubble.addEventListener('click', function () {
+      chatWindow.hidden ? openChat() : closeChat();
+    });
+    chatClose.addEventListener('click', closeChat);
+  })();
+  </script>
 </body>
 </html>
